@@ -13,21 +13,21 @@ Folder Template
       |__Client-Materials
       |__Key-References 
   |__ data
-      |__raw-data
-      |__processed-data
-  |__ outputs
-      |__figures
-      |__listings
-      |__tables
-  |__ reference-manager
-      |__references.bib
-  |__ scripts
-      |__functions
-      |__temp
-  |__ technical-reports
-      |__clinical-study-reports
-      |__manuscripts
-  |__ templates
+      |__Raw-Data
+      |__Processed-Data
+  |__ Outputs
+      |__Figures
+      |__Listings
+      |__Tables
+  |__ Reference-Manager
+      |__References.bib
+  |__ R
+      |__Functions
+      |__Temp
+  |__ Technical-Reports
+      |__Clinical-Study-Reports
+      |__Manuscripts
+  |__ Templates
 
 ```
 
