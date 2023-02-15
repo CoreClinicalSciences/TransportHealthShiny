@@ -12,7 +12,7 @@ Folder Template
   |__ Background-Materials
       |__Client-Materials
       |__Key-References 
-  |__ data
+  |__ Data
       |__Raw-Data
       |__Processed-Data
   |__ Outputs
@@ -73,9 +73,8 @@ Each folders will contain the following:
     -   `tex` files: Use to style Latex/PDF documents
     -   `CSS` files: Use to style HTML documents
     -   `CSL` files:
-        -   Use to define formatting of citations and bibliographies
-
-        -   Short for Citation Style Language (CSL)
+       -   Use to define formatting of citations and bibliographies
+       -   Short for Citation Style Language (CSL)
     -   `SCSS` files: Use for HTML documents as [Quarto themes](https://quarto.org/docs/output-formats/html-themes-more.html)
 
 ## Resources
