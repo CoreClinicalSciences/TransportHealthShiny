@@ -4,8 +4,7 @@ This is a template project folder for Core Clinical Sciences. **It is expected a
 
 ## Folders organization
 
-While different projects will require its own specific organizations, it is important to establish a common template. The minimum organization of folder structures will include the following:
-
+While different projects will require its own specific organization, it is important to establish a common template as a minimum organization. The folder template will include:  
 
 ```
 Folder Template
@@ -19,11 +18,11 @@ Folder Template
       |__Figures
       |__Listings
       |__Tables
-  |__ Reference-Manager
-      |__References.bib
   |__ R
       |__Functions
       |__Temp
+  |__ Reference-Manager
+      |__References.bib
   |__ Technical-Reports
       |__Clinical-Study-Reports
       |__Manuscripts
@@ -53,14 +52,14 @@ Each folders will contain the following:
 
 -   `Presentations`: A folder for slide decks
 
--   `Reference-Manager`: store a reference manager (e.g., Endnote here) to output bib files
-
-    -   `references.bib`: A bib file to be used in reports/presentations
-
 -   `R`: This is where you keep your R (or other language) scripts
 
     -   `Functions`: store your functions here
     -   `Temp`: (Not necessary) save temporary outputs or scripts generated for exploratory or testing purposes
+    
+-   `Reference-Manager`: store a reference manager (e.g., Endnote here) to output bib files
+
+    -   `references.bib`: A bib file to be used in reports/presentations
 
 -   `Technical-Reports`: This is where you work on deliverables (e.g., clinical study reports, manuscripts, and other technical reports)
 
@@ -76,7 +75,3 @@ Each folders will contain the following:
         -    Use to define formatting of citations and bibliographies
         -   Short for Citation Style Language (CSL)
     -   `SCSS` files: Use for HTML documents as [Quarto themes](https://quarto.org/docs/output-formats/html-themes-more.html)
-
-## Resources
-
--   [R Project Folder template accessible for CCS members](https://github.com/CoreClinicalSciences/00-Project-Folder-Template)
