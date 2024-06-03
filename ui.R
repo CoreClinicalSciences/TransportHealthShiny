@@ -19,7 +19,8 @@ ui <- dashboardPage(
               h2("DAG Tab Content")),
       
       tabItem(tabName = "data",
-              fileInput("fileInput", "Upload CSV File", accept = c(".csv")),
+              fileInput("studyDataInput", "Upload Study Data (CSV File)", accept = c(".csv")),
+              fileInput("targetDataInput", "Upload Target Data (CSV File)", accept = c(".csv")),
               selectInput("method", "Select Method", 
                           choices = c("IOPW", "G-Computation", "MAIC", "NMI")),
               uiOutput("dataUI")),

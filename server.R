@@ -3,19 +3,30 @@ library(shinydashboard)
 
 server <- function(input, output, session) {
   
-  data <- reactive({
-    req(input$fileInput)
-    read.csv(input$fileInput$datapath)
+  studyData <- reactive({
+    req(input$studyDataInput)
+    read.csv(input$studyDataInput$datapath)
+  })
+  
+  targetData <- reactive({
+    req(input$targetDataInput)
+    read.csv(input$targetDataInput$datapath)
   })
   
   observeEvent(input$method, {
     if(input$method == "IOPW") {
       output$modelUI <- renderUI({
+        #Get shared variable names between the data sets
+          req(studyData(), targetData())
+          commonVars <- intersect(names(studyData()), names(targetData()))
+          
+          ### Could add an error message here if the intersection is empty ###
+        
         fluidPage(
           h3("Model Inputs"),
-          selectInput("propensityModel", "Specify Variables in Propensity Model", choices = names(data()), multiple = TRUE),
-          selectInput("participationModel", "Specify Variables in Participation Model", choices = names(data()), multiple = TRUE),
-          selectInput("msmModel", "Specify Variables in MSM", choices = names(data()), multiple = TRUE)
+          selectInput("propensityModel", "Specify Variables in Propensity Model", choices = names(studyData()), multiple = TRUE),
+          selectInput("participationModel", "Specify Variables in Participation Model", choices = commonVars, multiple = TRUE),
+          selectInput("msmModel", "Specify Variables in MSM", choices = names(studyData()), multiple = TRUE)
         )
       })
       
@@ -35,7 +46,7 @@ server <- function(input, output, session) {
       })
       
       output$resultsTable <- renderTable({
-        head(data())  # Placeholder for actual results table
+        head(studyData())  # Placeholder for actual results table
       })
       
       output$propensityHistOutput <- renderPlot({
@@ -58,4 +69,5 @@ server <- function(input, output, session) {
       output$resultsUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
     }
   })
+  
 }
