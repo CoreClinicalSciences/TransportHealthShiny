@@ -17,7 +17,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "dag",
               h2("DAG Tab Content")),
-      
+      # We are forcing users to provide study and target data separately. The package supports both separated and merged datasets.
       tabItem(tabName = "data",
               fileInput("studyDataInput", "Upload Study Data (CSV File)", accept = c(".csv")),
               fileInput("targetDataInput", "Upload Target Data (CSV File)", accept = c(".csv")),
