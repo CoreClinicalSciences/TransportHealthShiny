@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Welcome to Transport Health</title>
+<title>Welcome to TransportHealth</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -46,7 +46,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Welcome to Transport Health</h1>
+<h1 class="title">Welcome to TransportHealth</h1>
 </div>
 
 
@@ -63,8 +63,30 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="what-is-transport-health" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-transport-health">What is Transport Health?</h2>
+<section id="what-is-transporthealth" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-transporthealth">What is TransportHealth?</h2>
+<p>TransportHealth is an open source project implementing generalizability and transportability analysis. It is led by Core Clinical Sciences and consists of an R package, <code>TransportHealthR</code>, and this Shiny app.</p>
+</section>
+<section id="what-are-generalizability-and-transportability-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="what-are-generalizability-and-transportability-analysis">What are generalizability and transportability analysis?</h2>
+<p>Generalizability and transportability analysis are approaches to extending findings from a study to a population that the study was not conducted on. This is done by adjusting for the distribution of effect modifiers in the target population, or the population we wish to extend findings to.</p>
+</section>
+<section id="how-does-transporthealth-do-generalizability-and-transportability-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="how-does-transporthealth-do-generalizability-and-transportability-analysis">How does TransportHealth do generalizability and transportability analysis?</h2>
+<p>Briefly, TransportHealth allows user to upload the data of the study whose findings they wish to extend (the source data) and the data from the target population (the target data). Then, users can specify the covariates to adjust for in the source data, and what effect modifiers to adjust for between the source and study data. Finally, the results of the analysis will be displayed in tabular and graphical formats. TransportHealth supports the following statistical approaches to transportability analysis:</p>
+<ul>
+<li>Inverse odds of participation weighting (IOPW)</li>
+<li>G-computation</li>
+<li>Target aggregate data adjustment (TADA)</li>
+<li>Network meta-interpolation (NMI)</li>
+</ul>
+<p>Each approach is adapted to different patterns of data availability. Watch these following tutorial videos to find out more:</p>
+<ul>
+<li>IOPW</li>
+<li>G-computation</li>
+<li>TADA</li>
+<li>NMI</li>
+</ul>
 </section>
 
 </main>

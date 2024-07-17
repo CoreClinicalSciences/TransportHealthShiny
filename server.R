@@ -3,28 +3,35 @@ library(shinydashboard)
 library(TransportHealthR)
 library(quarto)
 library(flextable)
+library(DT)
 
 server <- function(input, output, session) {
   
+  # Get Started page
   output$getStarted <- renderUI({suppressWarnings(includeHTML("GetStarted.html"))})
   
-  studyData <- reactive({
-    req(input$studyDataInput)
-    read.csv(input$studyDataInput$datapath)
-  })
-  
-  targetData <- reactive({
-    req(input$targetDataInput)
-    read.csv(input$targetDataInput$datapath)
-  })
-  
   observeEvent(input$method, {
+    # START: Module 1 IOPW functionality ----------------------------------------------------------
     if(input$method == "IOPW") {
+      # Data input UI
       output$dataUI <- renderUI({
         fluidPage(
           fileInput("studyDataInput", "Upload Study Data (CSV File)", accept = c(".csv")),
           fileInput("targetDataInput", "Upload Target Data (CSV File)", accept = c(".csv")))
       })
+      
+      # Read in data
+      studyData <- reactive({
+        req(input$studyDataInput)
+        read.csv(input$studyDataInput$datapath)
+      })
+      
+      targetData <- reactive({
+        req(input$targetDataInput)
+        read.csv(input$targetDataInput$datapath)
+      })
+      
+      # Model specification UI
       output$modelUI <- renderUI({
         #Get shared variable names between the data sets
           req(studyData(), targetData())
@@ -49,6 +56,7 @@ server <- function(input, output, session) {
         )
       })
       
+      # Read in model then fit it
       resultIP <- reactive({
       if (!is.null(input$msmModel)) 
         msmFormulaString <- paste0(input$response, " ~ ", paste(input$msmModel, collapse = " + "))
@@ -73,10 +81,11 @@ server <- function(input, output, session) {
                               transport = T)
       })
       
+      # Display analysis results
       output$resultsUI <- renderUI({
         fluidPage(
           h3(tags$b("Marginal structural model coefficient estimates")),
-          column(12, align = "center", tableOutput("resultsTable")),
+          column(12, align = "center", DTOutput("resultsTable")),
           column(12, align= "center", plotOutput("resultsPlot")),
           h3(tags$b("Mirrored histograms")),
           fluidRow(
@@ -91,9 +100,16 @@ server <- function(input, output, session) {
         )
       })
       
-      output$resultsTable <- renderTable({
-        summary(resultIP())$msmSummary$coefficients # Placeholder for actual results table
-      }, rownames = T)
+      # Put analysis results in right place for display
+      output$resultsTable <- renderDT({
+        datatable(summary(resultIP())$msmSummary$coefficients,
+                  escape = F,
+                  options = list(paging = F,
+                                 searching = F,
+                                 info = F),
+                  class = "display",
+                  rownames = T) # Placeholder for actual results table
+      })
       
       output$propensityHistOutput <- renderPlot({
         plot(resultIP(), type = "propensityHist")  # Placeholder plot
@@ -114,7 +130,10 @@ server <- function(input, output, session) {
       output$resultsPlot <- renderPlot({
         plot(resultIP(), type = "msm")
       })
-    } else {
+    } 
+    # END: Module 1 IOPW functionality -------------------------------------------------
+    
+    else {
       output$modelUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
       output$resultsUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
     }

@@ -10,12 +10,12 @@
 
         /* navbar (rest of the header) */
         .skin-blue .main-header .navbar {
-                              background-color: #0E2841;
+                              background-color: #073660;
                               }        
 
         /* main sidebar */
         .skin-blue .main-sidebar {
-                              background-color: #0E2841;
+                              background-color: #073660;
                               }
 
         /* active selected tab in the sidebarmenu */
@@ -25,7 +25,7 @@
                               
         /* other links in the sidebarmenu */
         .skin-blue .main-sidebar .sidebar .sidebar-menu a{
-                              background-color: #0E2841;
+                              background-color: #073660;
                               color: #FFFFFF;
                               }
 
@@ -40,6 +40,12 @@
                               }
                               
         p {
+          font-size: 20px;
+          font: Lato;
+          color:  #073660;
+        }
+        
+        li {
           font-size: 20px;
           font: Lato;
           color:  #073660;

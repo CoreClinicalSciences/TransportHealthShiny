@@ -6,7 +6,7 @@ ui <- dashboardPage(
                     class = "dropdown",
                     tags$img(src = "CCSLogoCropped.png", height = 50)
                   ),
-                  title = "Transport Health"),
+                  title = p("TransportHealth", style = "color: #FFFFFF; font = Lato")),
   dashboardSidebar(
     sidebarMenu(
       menuItem("Get Started", tabName = "home"),
