@@ -2,31 +2,35 @@ library(shiny)
 library(shinydashboard)
 
 ui <- dashboardPage(
-  dashboardHeader(title = "Transport Health"),
+  dashboardHeader(tags$li(
+                    class = "dropdown",
+                    tags$img(src = "CCSLogoCropped.png", height = 50)
+                  ),
+                  title = p("TransportHealth", style = "color: #FFFFFF; font = Lato")),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("User Manual"),
+      menuItem("Get Started", tabName = "home"),
       menuItem("DAG", tabName = "dag"),
-      menuItem("Data", tabName = "data"),
-      menuItem("Model", tabName = "model"),
-      menuItem("Results", tabName = "results"),
-      menuItem("Technical Overview")
+      menuItem("Data & Model", tabName = "dataModel"),
+      menuItem("Results", tabName = "results")
     )
   ),
-  dashboardBody(
+  dashboardBody(tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
     tabItems(
+      tabItem(tabName = "home",
+              uiOutput("getStarted")),
       tabItem(tabName = "dag",
               h2("DAG Tab Content")),
-      
-      tabItem(tabName = "data",
-              fileInput("studyDataInput", "Upload Study Data (CSV File)", accept = c(".csv")),
-              fileInput("targetDataInput", "Upload Target Data (CSV File)", accept = c(".csv")),
-              selectInput("method", "Select Method", 
-                          choices = c("IOPW", "G-Computation", "MAIC", "NMI")),
-              uiOutput("dataUI")),
-      
-      tabItem(tabName = "model",
-              uiOutput("modelUI")),
+      # We are forcing users to provide study and target data separately. The package supports both separated and merged datasets.
+      tabItem(tabName = "dataModel",
+              fluidRow(
+                column(width = 3,
+                       fluidPage(selectInput("method", "Select Method", 
+                                              choices = c("", "IOPW", "G-Computation", "TADA", "NMI")),
+                                uiOutput("dataUI"))),
+                column(width = 8, uiOutput("modelUI"))
+                      )
+              ),
       
       tabItem(tabName = "results",
               uiOutput("resultsUI"))
