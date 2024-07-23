@@ -1,77 +1,18 @@
-# Overview
+# TransportHealth Shiny App
 
-This is a template project folder for Core Clinical Sciences. **It is expected any additional specifications will build upon this folder structure.**
+This is the Github repo for the TransportHealth Shiny app. It is developed and maintained by Core Clinical Sciences
 
-## Folders organization
+## Instructions
 
-While different projects will require its own specific organization, it is important to establish a common template as a minimum organization. The folder template will include:  
+To run the app from the `R` project in this repo, you need the following packages:
 
-```
-Folder Template
-  |__ Background-Materials
-      |__Client-Materials
-      |__Key-References 
-  |__ Data
-      |__Raw-Data
-      |__Processed-Data
-  |__ Outputs
-      |__Figures
-      |__Listings
-      |__Tables
-  |__ R
-      |__Functions
-      |__Temp
-  |__ Reference-Manager
-      |__References.bib
-  |__ Technical-Reports
-      |__Clinical-Study-Reports
-      |__Manuscripts
-  |__ Templates
+- `shiny`
+- `shinydashboard`
+- `TransportHealthR`
+- `quarto`
+- `flextable`
+- `DT`
 
-```
+All packages except `TransportHealthR` can be downloaded from CRAN. To install `TransportHealthR`, run the following code in the console:
 
-Each folders will contain the following: 
-
--   `Background-materials`: A folder to store scientific and other reference documents.
-
-    -   `Client-Materials`: store key materials shared by clients here
-
-    -   `Key-References`: store other key materials here
-
--   `Data`: A folder to store your data.
-
-    -   `Raw-Data`: store the raw datasets here
-
-    -   `Processed-Data`: store the processed datasets here
-
--   `Outputs`: This is where you save all the tables, listings, figures to be used in presentations/reports.
-
-    -   `Figures`
-    -   `Listings`
-    -   `Tables`
-
--   `Presentations`: A folder for slide decks
-
--   `R`: This is where you keep your R (or other language) scripts
-
-    -   `Functions`: store your functions here
-    -   `Temp`: (Not necessary) save temporary outputs or scripts generated for exploratory or testing purposes
-    
--   `Reference-Manager`: store a reference manager (e.g., Endnote here) to output bib files
-
-    -   `references.bib`: A bib file to be used in reports/presentations
-
--   `Technical-Reports`: This is where you work on deliverables (e.g., clinical study reports, manuscripts, and other technical reports)
-
-    -   `Clinical-Study-Reports`
-    -   `Manuscripts`
-
--   `Templates`: Contains template documents for docx, tex, css, csl, and scss
-
-    -   `doc` template: Use `Word-Template-Times.docx` to style MS Word documents
-    -   `tex` files: Use to style Latex/PDF documents
-    -   `CSS` files: Use to style HTML documents
-    -   `CSL` files:
-        -    Use to define formatting of citations and bibliographies
-        -   Short for Citation Style Language (CSL)
-    -   `SCSS` files: Use for HTML documents as [Quarto themes](https://quarto.org/docs/output-formats/html-themes-more.html)
+`devtools::install_github("CoreClinicalSciences/TransportHealthR")`
