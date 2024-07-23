@@ -1,0 +1,31 @@
+---
+title: "Welcome to TransportHealth"
+format:
+  html:
+    css: style.css
+editor: source
+---
+
+## What is TransportHealth?
+
+TransportHealth is an open source project implementing generalizability and transportability analysis. It is led by Core Clinical Sciences and consists of an R package, `TransportHealthR`, and this Shiny app.
+
+## What are generalizability and transportability analysis?
+
+Generalizability and transportability analysis are approaches to extending findings from a study to a population that the study was not conducted on. This is done by adjusting for the distribution of effect modifiers in the target population, or the population we wish to extend findings to.
+
+## How does TransportHealth do generalizability and transportability analysis?
+
+Briefly, TransportHealth allows user to upload the data of the study whose findings they wish to extend (the source data) and the data from the target population (the target data). Then, users can specify the covariates to adjust for in the source data, and what effect modifiers to adjust for between the source and study data. Finally, the results of the analysis will be displayed in tabular and graphical formats. TransportHealth supports the following statistical approaches to transportability analysis:
+
+- Inverse odds of participation weighting (IOPW)
+- G-computation
+- Target aggregate data adjustment (TADA)
+- Network meta-interpolation (NMI)
+
+Each approach is adapted to different patterns of data availability. Watch these following tutorial videos to find out more:
+
+- IOPW
+- G-computation
+- TADA
+- NMI
