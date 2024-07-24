@@ -12,6 +12,7 @@ To run the app from the `R` project in this repo, you need the following package
 - `quarto`
 - `flextable`
 - `DT`
+- `devtools`
 
 All packages except `TransportHealthR` can be downloaded from CRAN. To install `TransportHealthR`, run the following code in the console:
 
