@@ -20,7 +20,7 @@
 
         /* active selected tab in the sidebarmenu */
         .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
-                              background-color: #1C7986;
+                              background-color: #2FB9AB;
                               }
                               
         /* other links in the sidebarmenu */
@@ -31,36 +31,36 @@
 
         /* other links in the sidebarmenu when hovered */
          .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
-                              background-color: #1C7986;
+                              background-color: #2FB9AB;
                               }
                               
         /* toggle button when hovered  */                    
          .skin-blue .main-header .navbar .sidebar-toggle:hover{
-                              background-color: #1C7986;
+                              background-color: #2FB9AB;
                               }
                               
         p {
           font-size: 20px;
-          font: Lato;
+          font: Arial;
         }
         
         li {
           font-size: 20px;
-          font: Lato;
+          font: Arial;
         }
         
         h3 {
           font-size: 30px;
-          font: Lato;
+          font: Arial;
         }
         
         h2 {
           font-size: 40px;
-          font: Lato;
+          font: Arial;
         }
         
         h1 {
           font-size: 50px;
-          font: Lato;
+          font: Arial;
         }
                               
