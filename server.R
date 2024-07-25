@@ -16,8 +16,8 @@ server <- function(input, output, session) {
       # Data input UI
       output$dataUI <- renderUI({
         fluidPage(
-          fileInput("studyDataInput", "Upload Study Data (CSV File)", accept = c(".csv")),
-          fileInput("targetDataInput", "Upload Target Data (CSV File)", accept = c(".csv")))
+          fileInput("studyDataInput", "Upload source data (CSV File)", accept = c(".csv")),
+          fileInput("targetDataInput", "Upload target data (CSV File)", accept = c(".csv")))
       })
       
       # Read in data
@@ -41,15 +41,15 @@ server <- function(input, output, session) {
         
         fluidRow(
           column(width = 4,
-            fluidPage(selectInput("response", "Specify the response variable", choices = names(studyData()), multiple = FALSE),
-                      selectInput("treatment", "Specify the treatment variable", choices = names(studyData()), multiple = FALSE)
+            fluidPage(selectInput("response", "Response variable", choices = names(studyData()), multiple = FALSE),
+                      selectInput("treatment", "Treatment variable", choices = names(studyData()), multiple = FALSE)
             )
           ),
           column(width = 4,
-            fluidPage(selectInput("propensityModel", "Specify Variables in Propensity Model", choices = names(studyData()), multiple = TRUE),
-                      selectInput("participationModel", "Specify Variables in Participation Model", choices = commonVars, multiple = TRUE),
-                      selectInput("msmModel", "Specify Variables in MSM", choices = names(studyData()), multiple = TRUE),
-                      selectInput("responseType", "Specify the type of the response variable and regression model to be fit",
+            fluidPage(selectInput("propensityModel", "Propensity model", choices = names(studyData()), multiple = TRUE),
+                      selectInput("participationModel", "Participation model", choices = commonVars, multiple = TRUE),
+                      selectInput("msmModel", "MSM", choices = names(studyData()), multiple = TRUE),
+                      selectInput("responseType", "Type of the response variable and regression model",
                                   choices = c("Continuous - Normal", "Binary - Logistic", "Ordinal - Logistic", "Survival - AFT", "Survival - Cox PH"))
                       )
           )
