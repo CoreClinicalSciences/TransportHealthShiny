@@ -5,6 +5,8 @@ library(quarto)
 library(flextable)
 library(DT)
 
+source("CCSTheme.R")
+
 server <- function(input, output, session) {
   
   # Get Started page
@@ -73,11 +75,16 @@ server <- function(input, output, session) {
       familyList <- list(stats::gaussian, stats::binomial, "survreg", "coxph")
       names(familyList) <- c("Continuous - Normal", "Binary - Logistic", "Survival - AFT", "Survival - Cox PH")
       
+      # Convert treatment variable to factor in study data for plotting compatibility
+      studyDataTrtmtFactor <- studyData()
+      
+      studyDataTrtmtFactor[[input$treatment]] <- as.factor(studyDataTrtmtFactor[[input$treatment]])
+      
       transportIP(msmFormula = as.formula(msmFormulaString),
                               propensityScoreModel = as.formula(propensityFormulaString),
                               participationModel = as.formula(participationFormulaString),
                               family = familyList[[input$responseType]],
-                              data = list(studyData = studyData(), targetData = targetData()),
+                              data = list(studyData = studyDataTrtmtFactor, targetData = targetData()),
                               transport = T)
       })
       
@@ -106,29 +113,30 @@ server <- function(input, output, session) {
                   escape = F,
                   options = list(paging = F,
                                  searching = F,
-                                 info = F),
+                                 info = F,
+                                 autowidth = F),
                   class = "display",
-                  rownames = T) # Placeholder for actual results table
+                  rownames = T)
       })
       
       output$propensityHistOutput <- renderPlot({
-        plot(resultIP(), type = "propensityHist")  # Placeholder plot
+        plot(resultIP(), type = "propensityHist") + CCS_theme(scale_type = "fill") + xlab("Propensity score")
       })
       
       output$participationHistOutput <- renderPlot({
-        plot(resultIP(), type = "participationHist")  # Placeholder plot
+        plot(resultIP(), type = "participationHist") + CCS_theme(scale_type = "fill") + xlab("Participation score")
       })
       
       output$propensitySMDOutput <- renderPlot({
-        plot(resultIP(), type = "propensitySMD")  # Placeholder plot
+        plot(resultIP(), type = "propensitySMD") + CCS_theme(scale_type = "color") + xlab("SMD") + ylab("Variable")
       })
       
       output$participationSMDOutput <- renderPlot({
-        plot(resultIP(), type = "participationSMD")  # Placeholder plot
+        plot(resultIP(), type = "participationSMD") + CCS_theme(scale_type = "color") + xlab("SMD") + ylab("Variable")
       })
       
       output$resultsPlot <- renderPlot({
-        plot(resultIP(), type = "msm")
+        plot(resultIP(), type = "msm") + CCS_theme(scale_type = "color")
       })
     } 
     # END: Module 1 IOPW functionality -------------------------------------------------
