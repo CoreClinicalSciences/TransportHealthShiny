@@ -212,7 +212,7 @@ server <- function(input, output, session) {
     } 
     # END: Module 1 IOPW functionality -------------------------------------------------
     # START: Module 2 G-computation functionality --------------------------------------
-    if (input$method == "G-Computation") {
+    else if (input$method == "G-Computation") {
       output$dataUI <- renderUI({
         fluidPage(
           selectInput("inputType", "What data are you inputting?",
@@ -264,16 +264,6 @@ server <- function(input, output, session) {
               fileInput("preparedModelInput", "Upload prepared model", accept = ".rds")
             )})
           
-          targetData <- reactive({
-            req(input$targetDataInput)
-            read.csv(input$targetDataInput$datapath)
-          })
-          
-          uploadedPreparedModel <- reactive({
-            req(input$preparedModelInput)
-            readRDS(input$preparedModelInput$datapath)
-          })
-          
           output$modelUI <- renderUI({
             fluidPage(selectInput("effectType", "Choose the type of the average treatment effect to be calculated",
                       choices = c("Mean/risk difference", "Relative risk", "Odds ratio", "Hazard ratio")))
@@ -292,19 +282,32 @@ server <- function(input, output, session) {
         outcomeFormula <- paste0(outcomeFormula, " + ", paste(baseTerms, collapse = " + "))
         outcomeFormula <- paste0(outcomeFormula, " + ", paste(paste0(input$treatment, ":", input$effectModifiers), collapse = " + "))
         
+        data <- studyData()
+        data[[input$treatment]] <- factor(data[[input$treatment]])
+        
         transportGCPreparedModel(outcomeModel = as.formula(outcomeFormula),
                                  response = input$response,
                                  treatment = input$treatment,
                                  family = familyList[[input$responseType]],
-                                 studyData = studyData(),
+                                 studyData = data,
                                  wipe = input$wipe)
+      })
+      
+      targetData <- reactive({
+        req(input$targetDataInput)
+        read.csv(input$targetDataInput$datapath)
+      })
+      
+      uploadedPreparedModel <- reactive({
+        req(input$preparedModelInput)
+        readRDS(input$preparedModelInput$datapath)
       })
       
       outcomeTypes <- c("meanDiff", "rr", "or", "hr")
       names(outcomeTypes) <- c("Mean/risk difference", "Relative risk", "Odds ratio", "Hazard ratio")
       
       resultGC <- reactive({
-        transportGC(effectType = outcomeType[[input$effectType]],
+        transportGC(effectType = outcomeTypes[[input$effectType]],
                     preparedModel = uploadedPreparedModel(),
                     targetData = targetData())
       })
@@ -340,6 +343,24 @@ server <- function(input, output, session) {
                       h3(tags$b("Coefficient plot of outcome model")),
                       column(12, align = "center", plotOutput("preparedModelCoefPlot"))
                       )
+          })
+        } else if (input$resultType == "Transported effect") {
+          output$effect <- renderText(paste0("Transported average treatment effect estimate: ", resultGC()$effect))
+          output$se <- renderText(paste0("Standard error: ", sqrt(resultGC()$var)))
+          output$effectType <- renderText(paste0("Effect type: ", input$effectType))
+          
+          output$atePlot <- renderPlot(plot(resultGC()) + CCS_theme(scale_type = "color"))
+          
+          output$resultsUI <- renderUI({
+            fluidPage(selectInput("resultType", "What results would you like to view?",
+                                  choices = c("Transported effect", "Prepared model", "")),
+                      h3(tags$b("Coefficient estimates of outcome model")),
+                      textOutput("effect"),
+                      textOutput("se"),
+                      textOutput("effectType"),
+                      h3(tags$b("Coefficient plot of outcome model")),
+                      column(12, align = "center", plotOutput("atePlot"))
+            )
           })
         }
       })
