@@ -7,12 +7,16 @@ library(DT)
 library(bslib)
 library(ggplot2)
 library(thematic)
+library(modelsummary)
 
 source("CCSTheme.R")
 #thematic::thematic_shiny(font = "auto")
 
 server <- function(input, output, session) {
   #bslib::bs_themer()
+  familyList <- list(stats::gaussian, stats::binomial, "survreg", "coxph")
+  names(familyList) <- c("Continuous - Normal", "Binary - Logistic", "Survival - AFT", "Survival - Cox PH")
+  
   # Get Started page
   output$getStarted <- renderUI({suppressWarnings(includeHTML("GetStarted.html"))})
   
@@ -207,7 +211,140 @@ server <- function(input, output, session) {
       })
     } 
     # END: Module 1 IOPW functionality -------------------------------------------------
-    
+    # START: Module 2 G-computation functionality --------------------------------------
+    if (input$method == "G-Computation") {
+      output$dataUI <- renderUI({
+        fluidPage(
+          selectInput("inputType", "What data are you inputting?",
+                      choices = c("", "Source", "Target + Prepared model"))
+      )})
+      
+      observeEvent(input$inputType, {
+        if (input$inputType == "Source") {
+          output$dataUI <- renderUI({
+            fluidPage(
+              selectInput("inputType", "What data are you inputting?",
+                          choices = c("Source", "", "Target + Prepared model")),
+              fileInput("studyDataInput", "Upload data", accept = ".csv")
+            )})
+          
+          output$modelUI <- renderUI({
+            #Get variable names from source data
+            req(studyData())
+            availableVars <- names(studyData())
+            
+            ### Could add an error message here if the intersection is empty ###
+            
+            fluidRow(
+              column(width = 4,
+                     fluidPage(selectInput("response", "Response variable", choices = names(studyData()), multiple = FALSE),
+                               selectInput("treatment", "Treatment variable", choices = names(studyData()), multiple = FALSE),
+                               selectInput("covariates", "Covariates", choices = names(studyData()), multiple = TRUE),
+                               selectInput("effectModifiers", "Effect modifiers", choices = names(studyData()), multiple = TRUE),
+                               selectInput("responseType", "Type of the response variable and regression model",
+                                           choices = c("Continuous - Normal", "Binary - Logistic", "Ordinal - Logistic", "Survival - AFT", "Survival - Cox PH")),
+                               checkboxInput("wipe", "Erase source data - SEs may be invalid if erased")
+                     )
+              ),
+              column(width = 4,
+                     downloadButton("preparedModelDownload", "Download prepared model")
+                     )
+              )}
+            )
+            
+          output$preparedModelDownload <- downloadHandler(filename = "preparedModel.rds",
+                                                            content = function (file) {saveRDS(preparedModel(), file)})
+        }
+        else if (input$inputType == "Target + Prepared model") {
+          output$dataUI <- renderUI({
+            fluidPage(
+              selectInput("inputType", "What data are you inputting?",
+                          choices = c("Target + Prepared model", "", "Source")),
+              fileInput("targetDataInput", "Upload data", accept = ".csv"),
+              fileInput("preparedModelInput", "Upload prepared model", accept = ".rds")
+            )})
+          
+          targetData <- reactive({
+            req(input$targetDataInput)
+            read.csv(input$targetDataInput$datapath)
+          })
+          
+          uploadedPreparedModel <- reactive({
+            req(input$preparedModelInput)
+            readRDS(input$preparedModelInput$datapath)
+          })
+          
+          output$modelUI <- renderUI({
+            fluidPage(selectInput("effectType", "Choose the type of the average treatment effect to be calculated",
+                      choices = c("Mean/risk difference", "Relative risk", "Odds ratio", "Hazard ratio")))
+          })
+        }
+        })
+      
+      studyData <- reactive({
+        req(input$studyDataInput)
+        read.csv(input$studyDataInput$datapath)
+      })
+      
+      preparedModel <- reactive({
+        outcomeFormula <- paste0(input$response, " ~ ", input$treatment)
+        baseTerms <- union(input$covariates, input$effectModifiers)
+        outcomeFormula <- paste0(outcomeFormula, " + ", paste(baseTerms, collapse = " + "))
+        outcomeFormula <- paste0(outcomeFormula, " + ", paste(paste0(input$treatment, ":", input$effectModifiers), collapse = " + "))
+        
+        transportGCPreparedModel(outcomeModel = as.formula(outcomeFormula),
+                                 response = input$response,
+                                 treatment = input$treatment,
+                                 family = familyList[[input$responseType]],
+                                 studyData = studyData(),
+                                 wipe = input$wipe)
+      })
+      
+      outcomeTypes <- c("meanDiff", "rr", "or", "hr")
+      names(outcomeTypes) <- c("Mean/risk difference", "Relative risk", "Odds ratio", "Hazard ratio")
+      
+      resultGC <- reactive({
+        transportGC(effectType = outcomeType[[input$effectType]],
+                    preparedModel = uploadedPreparedModel(),
+                    targetData = targetData())
+      })
+      
+      output$resultsUI <- renderUI({
+        fluidPage(selectInput("resultType", "What results would you like to view?",
+                  choices = c("", "Prepared model", "Transported effect")))
+      })
+      
+      observeEvent(input$resultType, {
+        if (input$resultType == "Prepared model") {
+          output$preparedModelSummary <- renderDT({
+            datatable(summary(preparedModel()$outcomeModel)$coefficients,
+                      escape = F,
+                      options = list(paging = F,
+                                     searching = F,
+                                     info = F,
+                                     autowidth = F),
+                      class = "display",
+                      rownames = T)
+          })
+          
+          output$preparedModelCoefPlot <- renderPlot(modelplot(preparedModel()$outcomeModel) + CCS_theme(scale_type = "color"))
+          
+          # Decide what to do for residuals with polr
+          #output$preparedModelResidPlot <- ggplot()
+          
+          output$resultsUI <- renderUI({
+            fluidPage(selectInput("resultType", "What results would you like to view?",
+                      choices = c("Prepared model", "", "Transported effect")),
+                      h3(tags$b("Coefficient estimates of outcome model")),
+                      column(12, align = "center", DTOutput("preparedModelSummary")),
+                      h3(tags$b("Coefficient plot of outcome model")),
+                      column(12, align = "center", plotOutput("preparedModelCoefPlot"))
+                      )
+          })
+        }
+      })
+    }
+    # END: Module 2 G-computation functionality -----------------------------------
     else {
       output$modelUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
       output$resultsUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
