@@ -354,11 +354,11 @@ server <- function(input, output, session) {
           output$resultsUI <- renderUI({
             fluidPage(selectInput("resultType", "What results would you like to view?",
                                   choices = c("Transported effect", "Prepared model", "")),
-                      h3(tags$b("Coefficient estimates of outcome model")),
+                      h3(tags$b("Transported effect estimate")),
                       textOutput("effect"),
                       textOutput("se"),
                       textOutput("effectType"),
-                      h3(tags$b("Coefficient plot of outcome model")),
+                      h3(tags$b("Plot of transported effect estimate")),
                       column(12, align = "center", plotOutput("atePlot"))
             )
           })
