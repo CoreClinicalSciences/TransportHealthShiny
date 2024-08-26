@@ -99,15 +99,15 @@ server <- function(input, output, session) {
       accordion_results <- accordion(
         accordion_panel(
           "MSM Coefficients",
-          "this is what these mean"
+          "This tab shows estimates of the coefficients in the specified marginal structural model and their estimated standard errors in table form and plot form. Conclusions should be drawn from the estimates in this table."
         ),
         accordion_panel(
           "SMD Plots",
-          "this is what these mean"
+          "This tab shows standardized mean differences (SMD) plots, or Love plots, for covariates between treatment groups (propensity) and effect modifiers between source and target data (participation). This is used to assess if covariate balance has been adequately achieved after weighting to determine if the propensity and participation models are correctly specified."
         ),
         accordion_panel(
           "Mirrored Histograms",
-          "this is what those mean")
+          "This tab shows mirrored histograms of the probability of being in the treatment group between treatment groups (propensity) and of the probability of being in the source dataset between the source and target data (participation). This is used to assess positivity.")
       )
       
       # Display analysis results
