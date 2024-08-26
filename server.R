@@ -1,6 +1,6 @@
 library(shiny)
 #library(shinydashboard)
-library(TransportHealthR)
+library(TransportHealth)
 library(quarto)
 library(flextable)
 library(DT)
@@ -94,33 +94,78 @@ server <- function(input, output, session) {
                               transport = T)
       })
       
+      #creating accordion for results panel
+      
+      accordion_results <- accordion(
+        accordion_panel(
+          "MSM Coefficients",
+          "this is what these mean"
+        ),
+        accordion_panel(
+          "SMD Plots",
+          "this is what these mean"
+        ),
+        accordion_panel(
+          "Mirrored Histograms",
+          "this is what those mean")
+      )
+      
       # Display analysis results
       output$resultsUI <- renderUI({
-        fluidPage(
-          h3(tags$b("Marginal structural model coefficient estimates")),
-          fluidRow(
-            title = "Marginal Structural Model Coefficient Estimates", solidHeader = TRUE, status="danger", collapsible = TRUE, width = 12, 
-            "box content", br(), "More box content",
-            DTOutput("resultsTable"),
+        layout_sidebar(
+          sidebar = sidebar(
+            title = "Understanding Your Results",
+            accordion_results
           ),
-          #box(
-          #  title = "Results Plot", status = "primary", solidHeader = TRUE,
-          #  collapsible = TRUE,
-          #  plotOutput("resultsPlot", height = 250)
-          #),
-          #column(12, align = "center", DTOutput("resultsTable")),
-          column(12, align= "center", plotOutput("resultsPlot")),
-          #h3(tags$b("Mirrored histograms")),
-          fluidRow(
-            column(6, fluidPage(plotOutput("propensityHistOutput"), span(p("Propensity", align = "center")))),
-            column(6, fluidPage(plotOutput("participationHistOutput"), span(p("Participation", align = "center"))))
+          card(
+            min_height="400px",
+            card_header(
+              class = "bg-secondary",
+              "Marginal Structural Model (MSM) Coefficient Estimates"),    
+            navset_card_tab(
+              nav_panel(
+                "Table",
+                DTOutput("resultsTable")
+              ),
+              nav_panel(
+                "Plot",
+                plotOutput("resultsPlot")
+              )
+            )),
+          card(
+            min_height = "475px",
+            card_header(
+              class = "bg-secondary",
+              "Standardized Mean Difference (SMD) Plots"),
+            layout_column_wrap(
+              min_width = "400px",
+              min_height = "400px",
+              card(
+                "Propensity",
+                plotOutput("propensitySMDOutput")
+              ),
+              card (
+                "Participation",
+                plotOutput("participationSMDOutput")
+              )
+            )
           ),
-          h3(tags$b("Standardized mean differences plots")),
-          fluidRow(
-            column(6, fluidPage(plotOutput("propensitySMDOutput"), span(p("Propensity", align = "center")))),
-            column(6, fluidPage(plotOutput("participationSMDOutput"), span(p("Participation", align = "center"))))
-          )
-        )
+          card(
+            min_height = "475px",
+            card_header(
+              class = "bg-secondary",
+              "Mirrored Histograms"),
+            layout_column_wrap(
+              min_width = "400px",
+              min_height = "400px",
+              card(
+                "Propensity Histogram",
+                plotOutput("propensityHistOutput")
+              ),
+              card (
+                "Participation Histogram",
+                plotOutput("participationHistOutput")
+              ))))
       })
       
       # Put analysis results in right place for display
@@ -161,8 +206,6 @@ server <- function(input, output, session) {
         plot(resultIP(), type = "msm") + CCS_theme(scale_type = "color")
       })
     } 
-    
-    
     # END: Module 1 IOPW functionality -------------------------------------------------
     
     else {

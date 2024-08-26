@@ -31,22 +31,6 @@ methodSelectionUI <- tagList(
   uiOutput("dataUI")
 )
 
-#creating accordion for results panel
-
-accordion_results <- accordion(
-  accordion_panel(
-    "MSM Coefficients",
-    "this is what these mean"
-  ),
-  accordion_panel(
-    "SMD Plots",
-    "this is what these mean"
-  ),
-  accordion_panel(
-  "Mirrored Histograms",
-  "this is what those mean")
-)
-
 
 
 # UI ----------------------------------------------------------------------
@@ -75,59 +59,6 @@ ui <- page_navbar(
   
   
   #results panel
-  nav_panel(title = "Results", id = "results", p(
-    
-    layout_sidebar(
-      sidebar = sidebar(
-      title = "Understanding Your Results",
-      accordion_results
-      ),
-  card(
-      min_height="400px",
-      card_header(
-        class = "bg-secondary",
-        "Marginal Structural Model (MSM) Coefficient Estimates"),    
-    navset_card_tab(
-      nav_panel(
-        "Table",
-        DTOutput("resultsTable")
-      ),
-      nav_panel(
-        "Plot",
-      plotOutput("resultsPlot")
-      )
-    )),
-  card(
-    min_height = "475px",
-    card_header(
-      class = "bg-secondary",
-      "Standardized Mean Difference (SMD) Plots"),
-      layout_column_wrap(
-       min_width = "400px",
-        min_height = "400px",
-        card(
-        "Propensity",
-        plotOutput("propensitySMDOutput")
-      ),
-     card (
-        "Participation",
-        plotOutput("participationSMDOutput")
-      )
-    )
-  ),
-  card(
-    min_height = "475px",
-    card_header(
-      class = "bg-secondary",
-      "Mirrored Histograms"),
-    layout_column_wrap(
-      min_width = "400px",
-      min_height = "400px",
-      card(
-        "Propensity Histogram",
-        plotOutput("propensityHistOutput")
-      ),
-      card (
-        "Participation Histogram",
-        plotOutput("participationHistOutput")
-      )))))))
+  nav_panel(title = "Results", id = "results", p(uiOutput("resultsUI")))
+
+)
