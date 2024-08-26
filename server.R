@@ -13,7 +13,9 @@ source("CCSTheme.R")
 #thematic::thematic_shiny(font = "auto")
 
 server <- function(input, output, session) {
+
   #bslib::bs_themer()
+
   familyList <- list(stats::gaussian, stats::binomial, "survreg", "coxph")
   names(familyList) <- c("Continuous - Normal", "Binary - Logistic", "Survival - AFT", "Survival - Cox PH")
   
