@@ -312,13 +312,38 @@ server <- function(input, output, session) {
                     targetData = targetData())
       })
       
+      accordion_results <- accordion(
+        accordion_panel(
+          "MSM Coefficients",
+          "this is what these mean"
+        ),
+        accordion_panel(
+          "SMD Plots",
+          "this is what these mean"
+        ),
+        accordion_panel(
+          "Mirrored Histograms",
+          "this is what those mean")
+      )
+      
       output$resultsUI <- renderUI({
-        fluidPage(selectInput("resultType", "What results would you like to view?",
-                  choices = c("", "Prepared model", "Transported effect")))
+      layout_sidebar(
+        sidebar = sidebar(
+          title = "Understanding Your Results",
+          accordion_results
+        ),
+        card(
+          min_height="150px",
+          card_header(
+            class = "bg-secondary",
+            "Result Type"),
+          selectInput("resultType", "What results would you like to view?",
+                                choices = c("", "Prepared model", "Transported effect"))))
       })
       
       observeEvent(input$resultType, {
         if (input$resultType == "Prepared model") {
+          # if (is.null(uploadedPreparedModel())) {
           output$preparedModelSummary <- renderDT({
             datatable(summary(preparedModel()$outcomeModel)$coefficients,
                       escape = F,
@@ -331,18 +356,49 @@ server <- function(input, output, session) {
           })
           
           output$preparedModelCoefPlot <- renderPlot(modelplot(preparedModel()$outcomeModel) + CCS_theme(scale_type = "color"))
+          # } else {
+          #   output$preparedModelSummary <- renderDT({
+          #     datatable(summary(uploadedPreparedModel()$outcomeModel)$coefficients,
+          #               escape = F,
+          #               options = list(paging = F,
+          #                              searching = F,
+          #                              info = F,
+          #                              autowidth = F),
+          #               class = "display",
+          #               rownames = T)
+          #   })
+          #   
+          #   output$preparedModelCoefPlot <- renderPlot(modelplot(uploadedPreparedModel()$outcomeModel) + CCS_theme(scale_type = "color"))
+          # }
           
           # Decide what to do for residuals with polr
           #output$preparedModelResidPlot <- ggplot()
           
           output$resultsUI <- renderUI({
-            fluidPage(selectInput("resultType", "What results would you like to view?",
-                      choices = c("Prepared model", "", "Transported effect")),
-                      h3(tags$b("Coefficient estimates of outcome model")),
-                      column(12, align = "center", DTOutput("preparedModelSummary")),
-                      h3(tags$b("Coefficient plot of outcome model")),
-                      column(12, align = "center", plotOutput("preparedModelCoefPlot"))
-                      )
+            layout_sidebar(
+              sidebar = sidebar(
+                title = "Understanding Your Results",
+                accordion_results
+              ),
+              card(
+                min_height="250px",
+                card_header(
+                  class = "bg-secondary",
+                  "Result Type"),
+                selectInput("resultType", "What results would you like to view?",
+                            choices = c("Prepared model", "", "Transported effect"))),
+              card(
+                  min_height="400px",
+                  card_header(
+                    class = "bg-secondary",
+                    "Outcome Model Summary"),
+                  DTOutput("preparedModelSummary")),
+              card(
+                min_height="400px",
+                card_header(
+                  class = "bg-secondary",
+                  "Outcome Model Coefficient Plot"),
+                plotOutput("preparedModelCoefPlot")))
           })
         } else if (input$resultType == "Transported effect") {
           output$effect <- renderText(paste0("Transported average treatment effect estimate: ", resultGC()$effect))
@@ -352,15 +408,33 @@ server <- function(input, output, session) {
           output$atePlot <- renderPlot(plot(resultGC()) + CCS_theme(scale_type = "color"))
           
           output$resultsUI <- renderUI({
-            fluidPage(selectInput("resultType", "What results would you like to view?",
-                                  choices = c("Transported effect", "Prepared model", "")),
-                      h3(tags$b("Transported effect estimate")),
-                      textOutput("effect"),
-                      textOutput("se"),
-                      textOutput("effectType"),
-                      h3(tags$b("Plot of transported effect estimate")),
-                      column(12, align = "center", plotOutput("atePlot"))
-            )
+            layout_sidebar(
+              sidebar = sidebar(
+                title = "Understanding Your Results",
+                accordion_results
+              ),
+              card(
+                min_height="250px",
+                card_header(
+                  class = "bg-secondary",
+                  "Result Type"),
+                selectInput("resultType", "What results would you like to view?",
+                            choices = c("Transported effect", "Prepared model", ""))),
+                card(
+                  min_height="250px",
+                  card_header(
+                    class = "bg-secondary",
+                    "Transported Effect Estimate"),
+                  p(textOutput("effect"),
+                            textOutput("se"),
+                            textOutput("effectType"))
+                  ),
+                card(
+                  min_height="400px",
+                  card_header(
+                    class = "bg-secondary",
+                    "Plot of Transported Effect Estimate"),
+                  plotOutput("atePlot")))
           })
         }
       })
