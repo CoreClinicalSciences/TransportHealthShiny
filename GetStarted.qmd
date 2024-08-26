@@ -2,7 +2,7 @@
 title: "Welcome to TransportHealth"
 format:
   html:
-    css: style.css
+    css: ./www/style.css
 editor: source
 ---
 

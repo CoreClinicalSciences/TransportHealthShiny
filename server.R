@@ -1,14 +1,18 @@
 library(shiny)
-library(shinydashboard)
+#library(shinydashboard)
 library(TransportHealthR)
 library(quarto)
 library(flextable)
 library(DT)
+library(bslib)
+library(ggplot2)
+library(thematic)
 
 source("CCSTheme.R")
+#thematic::thematic_shiny(font = "auto")
 
 server <- function(input, output, session) {
-  
+  #bslib::bs_themer()
   # Get Started page
   output$getStarted <- renderUI({suppressWarnings(includeHTML("GetStarted.html"))})
   
@@ -35,10 +39,12 @@ server <- function(input, output, session) {
       
       # Model specification UI
       output$modelUI <- renderUI({
+        
         #Get shared variable names between the data sets
           req(studyData(), targetData())
           commonVars <- intersect(names(studyData()), names(targetData()))
-          
+        
+
           ### Could add an error message here if the intersection is empty ###
         
         fluidRow(
@@ -92,9 +98,19 @@ server <- function(input, output, session) {
       output$resultsUI <- renderUI({
         fluidPage(
           h3(tags$b("Marginal structural model coefficient estimates")),
-          column(12, align = "center", DTOutput("resultsTable")),
+          fluidRow(
+            title = "Marginal Structural Model Coefficient Estimates", solidHeader = TRUE, status="danger", collapsible = TRUE, width = 12, 
+            "box content", br(), "More box content",
+            DTOutput("resultsTable"),
+          ),
+          #box(
+          #  title = "Results Plot", status = "primary", solidHeader = TRUE,
+          #  collapsible = TRUE,
+          #  plotOutput("resultsPlot", height = 250)
+          #),
+          #column(12, align = "center", DTOutput("resultsTable")),
           column(12, align= "center", plotOutput("resultsPlot")),
-          h3(tags$b("Mirrored histograms")),
+          #h3(tags$b("Mirrored histograms")),
           fluidRow(
             column(6, fluidPage(plotOutput("propensityHistOutput"), span(p("Propensity", align = "center")))),
             column(6, fluidPage(plotOutput("participationHistOutput"), span(p("Participation", align = "center"))))
@@ -109,36 +125,44 @@ server <- function(input, output, session) {
       
       # Put analysis results in right place for display
       output$resultsTable <- renderDT({
-        datatable(summary(resultIP())$msmSummary$coefficients,
+        # Extract coefficients and round them to 2 decimal places
+        data <- summary(resultIP())$msmSummary$coefficients
+        
+        # Render the DataTable with rounded data
+        datatable(data,
                   escape = F,
                   options = list(paging = F,
                                  searching = F,
                                  info = F,
-                                 autowidth = F),
+                                 width = '100%'),  # Set table width to 100%
                   class = "display",
-                  rownames = T)
+                  rownames = T,
+                  fillContainer = TRUE) %>%
+          formatRound(columns = c("Estimate", "Std. Error", "t value", "Pr(>|t|)"), digits = 2)  # Specify numeric columns by name
       })
       
       output$propensityHistOutput <- renderPlot({
-        plot(resultIP(), type = "propensityHist") + CCS_theme(scale_type = "fill") + xlab("Propensity score")
+        plot(resultIP(), type = "propensityHist") + CCS_theme(scale_type = "fill") + xlab("Propensity score") + theme_minimal(base_family="Roboto")
       })
       
       output$participationHistOutput <- renderPlot({
-        plot(resultIP(), type = "participationHist") + CCS_theme(scale_type = "fill") + xlab("Participation score")
+        plot(resultIP(), type = "participationHist") + CCS_theme(scale_type = "fill") + xlab("Participation score") + theme_minimal(base_family="Roboto")
       })
       
       output$propensitySMDOutput <- renderPlot({
-        plot(resultIP(), type = "propensitySMD") + CCS_theme(scale_type = "color") + xlab("SMD") + ylab("Variable")
+        plot(resultIP(), type = "propensitySMD") + CCS_theme(scale_type = "color") + xlab("SMD") + ylab("Variable") + theme_minimal(base_family="Roboto")
       })
       
       output$participationSMDOutput <- renderPlot({
-        plot(resultIP(), type = "participationSMD") + CCS_theme(scale_type = "color") + xlab("SMD") + ylab("Variable")
+        plot(resultIP(), type = "participationSMD") + CCS_theme(scale_type = "color") + xlab("SMD") + ylab("Variable") + theme_minimal(base_family="Roboto")
       })
       
       output$resultsPlot <- renderPlot({
         plot(resultIP(), type = "msm") + CCS_theme(scale_type = "color")
       })
     } 
+    
+    
     # END: Module 1 IOPW functionality -------------------------------------------------
     
     else {

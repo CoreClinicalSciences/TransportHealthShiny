@@ -1,10 +1,18 @@
 library(ggplot2)
 library(ggtext)
 
+
 CCS_theme <- function(scale_type = NULL, reverse = F) {
   font <- "Arial"
   
-  CCS_color <- c("#073660", "#1C7986", "#2FB9AB", "#EFC705", "#F04F24", "#942092", "#521B92")
+  "#462A79"
+  "#423F85"
+  "#39548C"
+  "#218E8B"
+  "#61CA5F"
+  "#BDDD21"
+  
+  CCS_color <- c("#218E8B",  "#BDDD21",   "#61CA5F", "#462A79",  "#39548C", "#423F85")
   #extended_CCS_color <- c(CCS_color, "#C62828", "#6A1B9A","#00695C", "#EF6C00", "#283593", "#1565C0")
   
     

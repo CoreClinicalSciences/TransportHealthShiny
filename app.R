@@ -1,5 +1,5 @@
 library(shiny)
-library(shinydashboard)
+library(bslib)
 
 # Define UI and server logic in separate files
 source("ui.R")

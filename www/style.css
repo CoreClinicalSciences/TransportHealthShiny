@@ -1,45 +1,109 @@
+        /*default font*/
+        body {
+          font-family: Arial, sans-serif;
+          font-size: 1.3em
+          }
+        
+         p {
+          font-family: Arial, sans-serif;
+          font-size: 1.3em
+          }
+        
+        li {
+          font-family: Arial, sans-serif;
+          font-size: 1.3em;
+        }
+        
+        h1 {
+          font-family: Arial, sans-serif;
+          font-size: 2.75em;
+        } 
+        
+        h2 {
+          font-family: Arial, sans-serif;
+          font-size: 2.5em;
+        }
+        
+        h3 {
+          font-family: Arial, sans-serif;
+          font-size: 2em;
+        }
+        
+        h4 {
+          font-family: Arial, sans-serif;
+          font-size: 1.5em;
+        }
+        
+         
                 /* logo */
         .skin-blue .main-header .logo {
-                              background-color: #073660;
+                              background-color: #423F85;
                               }
 
         /* logo when hovered */
         .skin-blue .main-header .logo:hover {
-                              background-color: #073660;
+                              background-color: #423F85;
                               }
 
         /* navbar (rest of the header) */
         .skin-blue .main-header .navbar {
-                              background-color: #073660;
+                              background-color: #423F85;
                               }        
 
         /* main sidebar */
         .skin-blue .main-sidebar {
-                              background-color: #073660;
+                              background-color: #393939;
                               }
 
         /* active selected tab in the sidebarmenu */
         .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
-                              background-color: #2FB9AB;
+                              background-color: #515151;
+                              color: #FFFFFF;
                               }
                               
         /* other links in the sidebarmenu */
         .skin-blue .main-sidebar .sidebar .sidebar-menu a{
-                              background-color: #073660;
-                              color: #FFFFFF;
+                              background-color: #393939;
+                              color: #D6D6D6;
                               }
 
         /* other links in the sidebarmenu when hovered */
          .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
-                              background-color: #2FB9AB;
+                              background-color: #423F85;
+                              color: #FFFFFF;
                               }
                               
         /* toggle button when hovered  */                    
          .skin-blue .main-header .navbar .sidebar-toggle:hover{
-                              background-color: #2FB9AB;
+                              background-color: #423F85;
                               }
+        /* collapsible boxes */
+.box.box-solid.box-danger>.box-header {
+  color:#000000;
+  background:#D8D6D5
+                    }
+
+.box.box-solid.box-danger{
+border-bottom-color:#D8D6D5;
+border-left-color:#D8D6D5;
+border-right-color:#D8D6D5;
+border-top-color:#D8D6D5;
+}
+
+.box.box-danger>.box-header {
+  color:#000000;
+  background:#fff
+                    }
+
+.box.box-danger{
+border-bottom-color:#D8D6D5;
+border-left-color:#D8D6D5;
+border-right-color:#D8D6D5;
+border-top-color:#D8D6D5;
+}
+
                               
-        p {
+/*        p {
           font-size: 20px;
           font: Arial;
         }
@@ -63,4 +127,4 @@
           font-size: 50px;
           font: Arial;
         }
-                              
+*/                              
