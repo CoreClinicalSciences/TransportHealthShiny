@@ -16,4 +16,4 @@ To run the app from the `R` project in this repo, you need the following package
 
 All packages except `TransportHealthR` can be downloaded from CRAN. To install `TransportHealthR`, run the following code in the console:
 
-`devtools::install_github("CoreClinicalSciences/TransportHealthR")`
+`devtools::install_github("CoreClinicalSciences/TransportHealth")`

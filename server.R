@@ -8,6 +8,7 @@ library(bslib)
 library(ggplot2)
 library(thematic)
 library(modelsummary)
+library(bsicons)
 
 source("CCSTheme.R")
 #thematic::thematic_shiny(font = "auto")
@@ -245,7 +246,8 @@ server <- function(input, output, session) {
                                selectInput("effectModifiers", "Effect modifiers", choices = names(studyData()), multiple = TRUE),
                                selectInput("responseType", "Type of the response variable and regression model",
                                            choices = c("Continuous - Normal", "Binary - Logistic", "Ordinal - Logistic", "Survival - AFT", "Survival - Cox PH")),
-                               checkboxInput("wipe", "Erase source data - SEs may be invalid if erased")
+                               checkboxInput("wipe", span("Erase source data - SEs may be invalid if erased",
+                                                          tooltip(bs_icon("info-circle"), "Ticking this box will cause the data used to fit the outcome model to be erased from the prepared model object. This means that it will not be possible to resample the source data, thus disabling bootstrapping. Since the app relies on bootstrapping to correctly calculate standard errors, the standard errors of the transported effect estimate may be misleading if this box is ticked.", placement = "bottom")))
                      )
               ),
               column(width = 4,
@@ -316,16 +318,9 @@ server <- function(input, output, session) {
       
       accordion_results <- accordion(
         accordion_panel(
-          "MSM Coefficients",
-          "this is what these mean"
-        ),
-        accordion_panel(
-          "SMD Plots",
-          "this is what these mean"
-        ),
-        accordion_panel(
-          "Mirrored Histograms",
-          "this is what those mean")
+          "Result Types",
+          "Choose \"Prepared model\" to view summary information about the fitted outcome model. Choose \"Transported effect\" to view the transported effect estimate."
+        )
       )
       
       output$resultsUI <- renderUI({
@@ -345,6 +340,16 @@ server <- function(input, output, session) {
       
       observeEvent(input$resultType, {
         if (input$resultType == "Prepared model") {
+          accordion_results <- accordion(
+            accordion_panel(
+              "Outcome Model Summary",
+              "This table displays summary information about the fitted outcome model, including the coefficient estimates and standard errors."
+            ),
+            accordion_panel(
+              "Outcome Model Coefficient Plot",
+              "This plot displays the estimates and confidence intervals for the coefficients in the outcome model."
+            )
+          )
           # if (is.null(uploadedPreparedModel())) {
           output$preparedModelSummary <- renderDT({
             datatable(summary(preparedModel()$outcomeModel)$coefficients,
@@ -403,6 +408,17 @@ server <- function(input, output, session) {
                 plotOutput("preparedModelCoefPlot")))
           })
         } else if (input$resultType == "Transported effect") {
+          accordion_results <- accordion(
+            accordion_panel(
+              "Transported Effect Estimate",
+              "This tab displays the transported effect estimate and its standard error."
+            ),
+            accordion_panel(
+              "Plot of Transported Effect Estimate",
+              "This plot displays the transported effect estimate and the associated confidence interval."
+            )
+          )
+          
           output$effect <- renderText(paste0("Transported average treatment effect estimate: ", resultGC()$effect))
           output$se <- renderText(paste0("Standard error: ", sqrt(resultGC()$var)))
           output$effectType <- renderText(paste0("Effect type: ", input$effectType))
