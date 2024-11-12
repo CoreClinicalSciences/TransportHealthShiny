@@ -37,7 +37,11 @@ methodSelectionUI <- tagList(
 
 ui <- page_navbar(
   theme = app_theme,
-  title = "TransportHealth",
+  title = div(
+    style = "display: flex; align-items: center; justify-content: space-between; width: 100%;",
+    span("TransportHealth"),
+    tags$img(src = "CCSlogo.png", height = "40px", style = "margin-right: 10px; margin-left: 10px;")
+  ),
   #bg = "white",
   #inverse = FALSE,
 
