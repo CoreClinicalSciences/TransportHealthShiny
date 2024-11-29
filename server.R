@@ -7,12 +7,19 @@ library(DT)
 library(bslib)
 library(ggplot2)
 library(thematic)
+library(modelsummary)
+library(bsicons)
 
 source("CCSTheme.R")
 #thematic::thematic_shiny(font = "auto")
 
 server <- function(input, output, session) {
+
   #bslib::bs_themer()
+
+  familyList <- list(stats::gaussian, stats::binomial, "survreg", "coxph")
+  names(familyList) <- c("Continuous - Normal", "Binary - Logistic", "Survival - AFT", "Survival - Cox PH")
+  
   # Get Started page
   output$getStarted <- renderUI({suppressWarnings(includeHTML("GetStarted.html"))})
   
@@ -207,7 +214,250 @@ server <- function(input, output, session) {
       })
     } 
     # END: Module 1 IOPW functionality -------------------------------------------------
-    
+    # START: Module 2 G-computation functionality --------------------------------------
+    else if (input$method == "G-Computation") {
+      output$dataUI <- renderUI({
+        fluidPage(
+          selectInput("inputType", "What data are you inputting?",
+                      choices = c("", "Source", "Target + Prepared model"))
+      )})
+      
+      observeEvent(input$inputType, {
+        if (input$inputType == "Source") {
+          output$dataUI <- renderUI({
+            fluidPage(
+              selectInput("inputType", "What data are you inputting?",
+                          choices = c("Source", "", "Target + Prepared model")),
+              fileInput("studyDataInput", "Upload data", accept = ".csv")
+            )})
+          
+          output$modelUI <- renderUI({
+            #Get variable names from source data
+            req(studyData())
+            availableVars <- names(studyData())
+            
+            ### Could add an error message here if the intersection is empty ###
+            
+            fluidRow(
+              column(width = 4,
+                     fluidPage(selectInput("response", "Response variable", choices = names(studyData()), multiple = FALSE),
+                               selectInput("treatment", "Treatment variable", choices = names(studyData()), multiple = FALSE),
+                               selectInput("covariates", "Covariates", choices = names(studyData()), multiple = TRUE),
+                               selectInput("effectModifiers", "Effect modifiers", choices = names(studyData()), multiple = TRUE),
+                               selectInput("responseType", "Type of the response variable and regression model",
+                                           choices = c("Continuous - Normal", "Binary - Logistic", "Ordinal - Logistic", "Survival - AFT", "Survival - Cox PH")),
+                               checkboxInput("wipe", span("Erase source data - SEs may be invalid if erased",
+                                                          tooltip(bs_icon("info-circle"), "Ticking this box will cause the data used to fit the outcome model to be erased from the prepared model object. This means that it will not be possible to resample the source data, thus disabling bootstrapping. Since the app relies on bootstrapping to correctly calculate standard errors, the standard errors of the transported effect estimate may be misleading if this box is ticked.", placement = "bottom")))
+                     )
+              ),
+              column(width = 4,
+                     downloadButton("preparedModelDownload", "Download prepared model")
+                     )
+              )}
+            )
+            
+          output$preparedModelDownload <- downloadHandler(filename = "preparedModel.rds",
+                                                            content = function (file) {saveRDS(preparedModel(), file)})
+        }
+        else if (input$inputType == "Target + Prepared model") {
+          output$dataUI <- renderUI({
+            fluidPage(
+              selectInput("inputType", "What data are you inputting?",
+                          choices = c("Target + Prepared model", "", "Source")),
+              fileInput("targetDataInput", "Upload data", accept = ".csv"),
+              fileInput("preparedModelInput", "Upload prepared model", accept = ".rds")
+            )})
+          
+          output$modelUI <- renderUI({
+            fluidPage(selectInput("effectType", "Choose the type of the average treatment effect to be calculated",
+                      choices = c("Mean/risk difference", "Relative risk", "Odds ratio", "Hazard ratio")))
+          })
+        }
+        })
+      
+      studyData <- reactive({
+        req(input$studyDataInput)
+        read.csv(input$studyDataInput$datapath)
+      })
+      
+      preparedModel <- reactive({
+        outcomeFormula <- paste0(input$response, " ~ ", input$treatment)
+        baseTerms <- union(input$covariates, input$effectModifiers)
+        outcomeFormula <- paste0(outcomeFormula, " + ", paste(baseTerms, collapse = " + "))
+        outcomeFormula <- paste0(outcomeFormula, " + ", paste(paste0(input$treatment, ":", input$effectModifiers), collapse = " + "))
+        
+        data <- studyData()
+        data[[input$treatment]] <- factor(data[[input$treatment]])
+        
+        transportGCPreparedModel(outcomeModel = as.formula(outcomeFormula),
+                                 response = input$response,
+                                 treatment = input$treatment,
+                                 family = familyList[[input$responseType]],
+                                 studyData = data,
+                                 wipe = input$wipe)
+      })
+      
+      targetData <- reactive({
+        req(input$targetDataInput)
+        read.csv(input$targetDataInput$datapath)
+      })
+      
+      uploadedPreparedModel <- reactive({
+        req(input$preparedModelInput)
+        readRDS(input$preparedModelInput$datapath)
+      })
+      
+      outcomeTypes <- c("meanDiff", "rr", "or", "hr")
+      names(outcomeTypes) <- c("Mean/risk difference", "Relative risk", "Odds ratio", "Hazard ratio")
+      
+      resultGC <- reactive({
+        transportGC(effectType = outcomeTypes[[input$effectType]],
+                    preparedModel = uploadedPreparedModel(),
+                    targetData = targetData())
+      })
+      
+      accordion_results <- accordion(
+        accordion_panel(
+          "Result Types",
+          "Choose \"Prepared model\" to view summary information about the fitted outcome model. Choose \"Transported effect\" to view the transported effect estimate."
+        )
+      )
+      
+      output$resultsUI <- renderUI({
+      layout_sidebar(
+        sidebar = sidebar(
+          title = "Understanding Your Results",
+          accordion_results
+        ),
+        card(
+          min_height="150px",
+          card_header(
+            class = "bg-secondary",
+            "Result Type"),
+          selectInput("resultType", "What results would you like to view?",
+                                choices = c("", "Prepared model", "Transported effect"))))
+      })
+      
+      observeEvent(input$resultType, {
+        if (input$resultType == "Prepared model") {
+          accordion_results <- accordion(
+            accordion_panel(
+              "Outcome Model Summary",
+              "This table displays summary information about the fitted outcome model, including the coefficient estimates and standard errors."
+            ),
+            accordion_panel(
+              "Outcome Model Coefficient Plot",
+              "This plot displays the estimates and confidence intervals for the coefficients in the outcome model."
+            )
+          )
+          # if (is.null(uploadedPreparedModel())) {
+          output$preparedModelSummary <- renderDT({
+            datatable(summary(preparedModel()$outcomeModel)$coefficients,
+                      escape = F,
+                      options = list(paging = F,
+                                     searching = F,
+                                     info = F,
+                                     autowidth = F),
+                      class = "display",
+                      rownames = T)
+          })
+          
+          output$preparedModelCoefPlot <- renderPlot(modelplot(preparedModel()$outcomeModel) + CCS_theme(scale_type = "color"))
+          # } else {
+          #   output$preparedModelSummary <- renderDT({
+          #     datatable(summary(uploadedPreparedModel()$outcomeModel)$coefficients,
+          #               escape = F,
+          #               options = list(paging = F,
+          #                              searching = F,
+          #                              info = F,
+          #                              autowidth = F),
+          #               class = "display",
+          #               rownames = T)
+          #   })
+          #   
+          #   output$preparedModelCoefPlot <- renderPlot(modelplot(uploadedPreparedModel()$outcomeModel) + CCS_theme(scale_type = "color"))
+          # }
+          
+          # Decide what to do for residuals with polr
+          #output$preparedModelResidPlot <- ggplot()
+          
+          output$resultsUI <- renderUI({
+            layout_sidebar(
+              sidebar = sidebar(
+                title = "Understanding Your Results",
+                accordion_results
+              ),
+              card(
+                min_height="250px",
+                card_header(
+                  class = "bg-secondary",
+                  "Result Type"),
+                selectInput("resultType", "What results would you like to view?",
+                            choices = c("Prepared model", "", "Transported effect"))),
+              card(
+                  min_height="400px",
+                  card_header(
+                    class = "bg-secondary",
+                    "Outcome Model Summary"),
+                  DTOutput("preparedModelSummary")),
+              card(
+                min_height="400px",
+                card_header(
+                  class = "bg-secondary",
+                  "Outcome Model Coefficient Plot"),
+                plotOutput("preparedModelCoefPlot")))
+          })
+        } else if (input$resultType == "Transported effect") {
+          accordion_results <- accordion(
+            accordion_panel(
+              "Transported Effect Estimate",
+              "This tab displays the transported effect estimate and its standard error."
+            ),
+            accordion_panel(
+              "Plot of Transported Effect Estimate",
+              "This plot displays the transported effect estimate and the associated confidence interval."
+            )
+          )
+          
+          output$effect <- renderText(paste0("Transported average treatment effect estimate: ", resultGC()$effect))
+          output$se <- renderText(paste0("Standard error: ", sqrt(resultGC()$var)))
+          output$effectType <- renderText(paste0("Effect type: ", input$effectType))
+          
+          output$atePlot <- renderPlot(plot(resultGC()) + CCS_theme(scale_type = "color"))
+          
+          output$resultsUI <- renderUI({
+            layout_sidebar(
+              sidebar = sidebar(
+                title = "Understanding Your Results",
+                accordion_results
+              ),
+              card(
+                min_height="250px",
+                card_header(
+                  class = "bg-secondary",
+                  "Result Type"),
+                selectInput("resultType", "What results would you like to view?",
+                            choices = c("Transported effect", "Prepared model", ""))),
+                card(
+                  min_height="250px",
+                  card_header(
+                    class = "bg-secondary",
+                    "Transported Effect Estimate"),
+                  p(textOutput("effect"),
+                            textOutput("se"),
+                            textOutput("effectType"))
+                  ),
+                card(
+                  min_height="400px",
+                  card_header(
+                    class = "bg-secondary",
+                    "Plot of Transported Effect Estimate"),
+                  plotOutput("atePlot")))
+          })
+        }
+      })
+    }
+    # END: Module 2 G-computation functionality -----------------------------------
     else {
       output$modelUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
       output$resultsUI <- renderUI({ NULL }) # Placeholder for the other methods' UI
