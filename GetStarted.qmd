@@ -21,11 +21,11 @@ Briefly, TransportHealth allows user to upload the data of the study whose findi
 - Inverse odds of participation weighting (IOPW)
 - G-computation
 - Target aggregate data adjustment (TADA)
-- Network meta-interpolation (NMI)
+- Interpolated g-computation
 
 Each approach is adapted to different patterns of data availability. Watch these following tutorial videos to find out more:
 
 - IOPW
 - G-computation
 - TADA
-- NMI
+- Interpolated g-computation
