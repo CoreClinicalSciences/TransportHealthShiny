@@ -27,7 +27,7 @@ app_theme = bs_theme(
 #generate single object containing both elements of model specification for sidebar_layout
 methodSelectionUI <- tagList(
   selectInput("method", "Select Method", 
-              choices = c("", "IOPW", "G-Computation", "TADA", "NMI")),
+              choices = c("", "IOPW", "G-Computation", "TADA", "Interpolated G-Computation")),
   uiOutput("dataUI")
 )
 
