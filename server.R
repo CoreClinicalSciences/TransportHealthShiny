@@ -30,8 +30,26 @@ server <- function(input, output, session) {
       output$dataUI <- renderUI({
         fluidPage(
           fileInput("studyDataInput", "Upload source data (CSV File)", accept = c(".csv")),
-          fileInput("targetDataInput", "Upload target data (CSV File)", accept = c(".csv")))
+          fileInput("targetDataInput", "Upload target data (CSV File)", accept = c(".csv")),
+          div(downloadLink("exampleStudyData", "Example source data file\n")),
+          div(downloadLink("exampleTargetData", "Example target data file\n")))
       })
+      
+      output$exampleStudyData <- downloadHandler(
+        filename = function() "study.csv",
+        content = function(con) {
+          example <- read.csv("study.csv")
+          write.csv(example, con, row.names = F)
+        }
+      )
+      
+      output$exampleTargetData <- downloadHandler(
+        filename = function() "target.csv",
+        content = function(con) {
+          example <- read.csv("target.csv")
+          write.csv(example, con, row.names = F)
+        }
+      )
       
       # Read in data
       studyData <- reactive({
@@ -222,13 +240,31 @@ server <- function(input, output, session) {
                       choices = c("", "Source", "Target + Prepared model"))
       )})
       
+      output$exampleStudyData <- downloadHandler(
+        filename = function() "study.csv",
+        content = function(con) {
+          example <- read.csv("study.csv")
+          write.csv(example, con, row.names = F)
+        }
+      )
+      
+      output$exampleTargetData <- downloadHandler(
+        filename = function() "target.csv",
+        content = function(con) {
+          example <- read.csv("target.csv")
+          write.csv(example, con, row.names = F)
+        }
+      )
+      
       observeEvent(input$inputType, {
         if (input$inputType == "Source") {
           output$dataUI <- renderUI({
             fluidPage(
               selectInput("inputType", "What data are you inputting?",
                           choices = c("Source", "", "Target + Prepared model")),
-              fileInput("studyDataInput", "Upload data", accept = ".csv")
+              fileInput("studyDataInput", "Upload data", accept = ".csv"),
+              div(downloadLink("exampleStudyData", "Example source data file\n")),
+              div(downloadLink("exampleTargetData", "Example target data file\n"))
             )})
           
           output$modelUI <- renderUI({
@@ -265,7 +301,9 @@ server <- function(input, output, session) {
               selectInput("inputType", "What data are you inputting?",
                           choices = c("Target + Prepared model", "", "Source")),
               fileInput("targetDataInput", "Upload data", accept = ".csv"),
-              fileInput("preparedModelInput", "Upload prepared model", accept = ".rds")
+              fileInput("preparedModelInput", "Upload prepared model", accept = ".rds"),
+              div(downloadLink("exampleStudyData", "Example source data file\n")),
+              div(downloadLink("exampleTargetData", "Example target data file\n"))
             )})
           
           output$modelUI <- renderUI({
@@ -465,9 +503,18 @@ server <- function(input, output, session) {
         fluidPage(
           fileInput("studyDataInput", "Upload source data (CSV File)", accept = c(".csv")),
           fileInput("targetDataInput", label = "Upload target data (CSV File)", accept = c(".csv")),
+          div(downloadLink("exampleStudyData", "Example source data file\n")),
           downloadLink("exampleAggregateTargetData", "Example aggregate target data file")
         )
       })
+      
+      output$exampleStudyData <- downloadHandler(
+        filename = function() "study.csv",
+        content = function(con) {
+          example <- read.csv("study.csv")
+          write.csv(example, con, row.names = F)
+        }
+      )
       
       output$exampleAggregateTargetData <- downloadHandler(
         filename = function() "aggregateTarget.csv",
