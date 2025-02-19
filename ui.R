@@ -40,7 +40,7 @@ ui <- page_navbar(
   title = div(
     class = "navbar-title-container",
     style = "width: 100%; position: relative; top: 15px",
-    span("TransportHealth v0.1.0"),
+    span("TransportHealth v1.0.0"),
     tags$img(src = "CCSlogo.png", height = "35px", style = "margin-right: 10px; margin-left: 10px;")
   ),
   #bg = "white",
